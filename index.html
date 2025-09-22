@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agri-Bot - Farmer Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="h-screen flex text-gray-800 font-inter bg-gray-50">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar w-64 flex-col p-4 border-r border-gray-200 hidden md:flex bg-white">
+        <div class="flex items-center justify-between mb-6">
+             <h1 class="text-xl font-bold text-green-700" data-translate="agriBotAI">Agri-Bot AI</h1>
+        </div>
+        <button id="new-chat-btn" class="w-full flex items-center justify-center bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors mb-4">
+            <i class="fas fa-plus mr-2"></i> <span data-translate="newChat">New Chat</span>
+        </button>
+        <div class="relative mb-4">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text" data-translate-placeholder="searchPlaceholder" placeholder="Search history..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex-grow overflow-y-auto">
+            <h2 class="text-sm font-semibold text-gray-500 mb-2" data-translate="chatHistory">Chat History</h2>
+            <div id="chat-history-list" class="space-y-2">
+                <!-- Chat history items will be dynamically inserted here -->
+            </div>
+        </div>
+        <div class="mt-auto">
+            <button id="settings-btn" class="w-full flex items-center p-2 rounded-lg hover:bg-gray-100">
+                <i class="fas fa-cog mr-3"></i> <span data-translate="settings">Settings</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col main-content">
+        <header class="flex items-center px-4 border-b border-gray-200 bg-white">
+             <div class="top-nav flex-1">
+                <button class="main-tab active px-4 py-2 font-semibold" data-tab="chat" data-translate="chatTab">Chat</button>
+                <button class="main-tab px-4 py-2 font-semibold text-gray-500" data-tab="trends" data-translate="marketTrends">Market Trends</button>
+                <button class="main-tab px-4 py-2 font-semibold text-gray-500" data-tab="news" data-translate="agriNews">Agri News</button>
+             </div>
+        </header>
+
+        <!-- Main Content Panels -->
+        <div id="chat-panel" class="main-tab-content flex-1 flex flex-col">
+            <!-- Chat Messages Container (This will scroll) -->
+            <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-4 flex flex-col">
+                <!-- Messages will be dynamically inserted here -->
+            </div>
+
+            <!-- Fixed Input Bar Container (This will NOT scroll) -->
+            <div class="p-4 bg-white border-t border-gray-200">
+                <div class="flex items-center bg-gray-100 rounded-lg p-2">
+                    <textarea id="chat-input" data-translate-placeholder="inputPlaceholder" placeholder="Ask a question or upload an image..." class="flex-grow resize-none border-none focus:ring-0 p-2 bg-transparent"></textarea>
+                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                    <button id="image-btn" class="p-2 text-gray-500 hover:text-blue-600" title="Upload Image"><i class="fas fa-image text-xl"></i></button>
+                    <button id="voice-btn" class="p-2 text-gray-500 hover:text-blue-600" title="Record Voice"><i class="fas fa-microphone text-xl"></i></button>
+                    <button id="send-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg ml-2 hover:bg-blue-700 transition-colors"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="trends-panel" class="main-tab-content hidden flex-1 p-6 overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-4">Live Mandi Prices</h2>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                    <span class="font-semibold text-lg">🍅 Tomato</span>
+                    <div>
+                        <span class="font-bold text-lg">₹25 / kg</span>
+                        <i class="fas fa-arrow-up text-green-500 ml-2"></i>
+                    </div>
+                </div>
+                 <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                    <span class="font-semibold text-lg">🧅 Onion</span>
+                    <div>
+                        <span class="font-bold text-lg">₹18 / kg</span>
+                        <i class="fas fa-arrow-down text-red-500 ml-2"></i>
+                    </div>
+                </div>
+                 <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                    <span class="font-semibold text-lg">🥔 Potato</span>
+                    <div>
+                        <span class="font-bold text-lg">₹22 / kg</span>
+                        <i class="fas fa-arrow-up text-green-500 ml-2"></i>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                    <span class="font-semibold text-lg">🌾 Wheat</span>
+                    <div>
+                        <span class="font-bold text-lg">₹2,275 / qtl</span>
+                        <i class="fas fa-minus text-gray-500 ml-2"></i>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm">
+                    <span class="font-semibold text-lg">🍚 Paddy</span>
+                    <div>
+                        <span class="font-bold text-lg">₹2,183 / qtl</span>
+                        <i class="fas fa-arrow-up text-green-500 ml-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="news-panel" class="main-tab-content hidden flex-1 p-6 overflow-y-auto">
+             <h2 class="text-2xl font-bold mb-4">Latest Agricultural News</h2>
+             <div class="space-y-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <h3 class="font-bold" data-translate="newsItem1Title">New Subsidy for Organic Fertilizers</h3>
+                    <p class="text-sm text-gray-600 mt-1" data-translate="newsItem1">The government has announced a new scheme to promote organic farming... <a href="#" class="text-blue-600 font-semibold">Read more</a></p>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <h3 class="font-bold">Monsoon Forecast Predicts Above-Average Rainfall</h3>
+                    <p class="text-sm text-gray-600 mt-1">The meteorological department has released its forecast for the upcoming season... <a href="#" class="text-blue-600 font-semibold">Read more</a></p>
+                </div>
+             </div>
+        </div>
+    </main>
+    
+    <!-- Right Sidebar -->
+    <aside class="w-64 p-4 border-l border-gray-200 bg-white hidden md:flex flex-col">
+        <div class="mb-6 pb-6 border-b"><div class="flex items-center mb-4"><span class="font-semibold">👤 Farmer123</span></div>
+            <div class="flex flex-col space-y-2">
+                 <label for="language-select" class="text-sm font-medium" data-translate="languageLabel">Language</label>
+                 <select id="language-select" class="border p-1 rounded-lg text-sm w-full">
+                     <option value="en">English</option>
+                     <option value="ta">தமிழ் (Tamil)</option>
+                 </select>
+            </div>
+        </div>
+        <div class="space-y-4 flex-grow">
+            <h3 class="font-bold text-lg" data-translate="helplineTitle">Agri-Officer Helpline</h3>
+            <p class="text-sm text-gray-600" data-translate="helplineSubtitle">Get expert support.</p>
+            <button class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700"><i class="fas fa-headset mr-2"></i> <span data-translate="supportButton">Support</span></button>
+        </div>
+        
+        <!-- Weather Widget -->
+        <div id="weather-widget" class="mt-auto pt-4 border-t">
+            <div id="weather-content" class="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p id="weather-loading" class="text-sm" data-translate="weatherLoading">Loading weather...</p>
+                <div id="weather-display" class="hidden">
+                    <div class="flex items-center justify-center">
+                        <i id="weather-icon" class="fas fa-2x text-blue-500"></i>
+                        <p id="weather-temp" class="text-3xl font-bold ml-4"></p>
+                    </div>
+                    <p id="weather-desc" class="text-sm text-gray-600 mt-2"></p>
+                    <p id="weather-location" class="text-xs text-gray-500 mt-1"></p>
+                </div>
+                 <div id="weather-error" class="hidden text-red-500 text-xs" data-translate="weatherError">
+                    Could not get weather. Please enable location services.
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold" data-translate="settingsTitle">Settings</h2>
+                <button id="close-settings-btn" class="text-gray-500 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center p-2 rounded-lg bg-gray-100"><i class="fas fa-user-circle mr-3"></i><span>User ID: Farmer123</span></div>
+                <button class="w-full flex items-center p-2 rounded-lg hover:bg-gray-100 text-left"><i class="fas fa-comment-dots mr-3"></i><span data-translate="feedbackButton">Send Feedback</span></button>
+                <button class="w-full flex items-center p-2 rounded-lg hover:bg-gray-100 text-left"><i class="fas fa-question-circle mr-3"></i><span data-translate="helpButton">Help</span></button>
+                <button class="w-full flex items-center p-2 rounded-lg hover:bg-gray-100 text-left text-red-500"><i class="fas fa-sign-out-alt mr-3"></i><span data-translate="logoutButton">Logout</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
+            <h2 class="text-xl font-bold mb-4" data-translate="deleteConfirmTitle">Confirm Deletion</h2>
+            <p class="mb-6" data-translate="deleteConfirmText">Are you sure you want to delete this chat? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-delete-btn" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300" data-translate="cancelButton">Cancel</button>
+                <button id="confirm-delete-btn" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700" data-translate="deleteButton">Delete</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- State Management ---
+        let chatHistory = [];
+        let activeChatId = null;
+        let chatIdToDelete = null;
+
+        // --- DOM Elements ---
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const imageBtn = document.getElementById('image-btn');
+        const fileInput = document.getElementById('file-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const languageSelect = document.getElementById('language-select');
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsModalOverlay = document.getElementById('settings-modal-overlay');
+        const closeSettingsBtn = document.getElementById('close-settings-btn');
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const chatHistoryList = document.getElementById('chat-history-list');
+        const deleteModalOverlay = document.getElementById('delete-modal-overlay');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const mainTabs = document.querySelectorAll('.main-tab');
+        const mainContents = document.querySelectorAll('.main-tab-content');
+
+        const weatherWidget = {
+            loading: document.getElementById('weather-loading'), display: document.getElementById('weather-display'), error: document.getElementById('weather-error'), icon: document.getElementById('weather-icon'), temp: document.getElementById('weather-temp'), desc: document.getElementById('weather-desc'), location: document.getElementById('weather-location'),
+        };
+
+        // --- Translations ---
+        const translations = {
+            en: {
+                agriBotAI: "Agri-Bot AI", newChat: "New Chat", searchPlaceholder: "Search history...", chatHistory: "Chat History", settings: "Settings", chatTab: "Chat",
+                initialBotMessage: "Hello! This is AI Agri-Bot. Ask your crop-related questions or upload a photo of a diseased plant.",
+                inputPlaceholder: "Ask a question or upload an image...", languageLabel: "Language", helplineTitle: "Agri-Officer Helpline", helplineSubtitle: "Get expert support.",
+                supportButton: "Support", settingsTitle: "Settings", feedbackButton: "Send Feedback", helpButton: "Help", logoutButton: "Logout", weatherLoading: "Loading weather...", weatherError: "Could not get weather. Please enable location services.",
+                deleteConfirmTitle: "Confirm Deletion", deleteConfirmText: "Are you sure you want to delete this chat? This action cannot be undone.", cancelButton: "Cancel", deleteButton: "Delete",
+                marketTrends: "Market Trends", agriNews: "Agri News", newsItem1Title: "New Subsidy for Organic Fertilizers", newsItem1: "The government has announced a new scheme to promote organic farming..."
+            },
+            ta: {
+                agriBotAI: "அக்ரி-பாட் AI", newChat: "புதிய உரையாடல்", searchPlaceholder: "வரலாற்றைத் தேடு...", chatHistory: "உரையாடல் வரலாறு", settings: "அமைப்புகள்", chatTab: "உரையாடல்",
+                initialBotMessage: "வணக்கம்! இது AI அக்ரி-பாட். உங்கள் பயிர் தொடர்பான கேள்ிகளைக் கேளுங்கள் அல்லது பாதிக்கப்பட்ட தாவரத்தின் புகைப்படத்தைப் பதிவேற்றவும்.",
+                inputPlaceholder: "ஒரு கேள்வியைக் கேளுங்கள் அல்லது ஒரு படத்தைப் பதிவேற்றவும்...", languageLabel: "மொழி", helplineTitle: "வேளாண் அதிகாரி உதவி மையம்", helplineSubtitle: "நிபுணர் ஆதரவைப் பெறுங்கள்.",
+                supportButton: "ஆதரவு", settingsTitle: "அமைப்புகள்", feedbackButton: "கருத்து அனுப்பு", helpButton: "உதவி", logoutButton: "வெளியேறு", weatherLoading: "வானிலை ஏற்றுகிறது...", weatherError: "வானிலையைப் பெற முடியவில்லை. இருப்பிடச் சேவைகளை இயக்கவும்.",
+                deleteConfirmTitle: "நீக்குதலை உறுதிப்படுத்தவும்", deleteConfirmText: "இந்த அரட்டையை நீக்க விரும்புகிறீர்களா? இந்தச் செயலைச் செயல்தவிர்க்க முடியாது.", cancelButton: "ரத்துசெய்", deleteButton: "நீக்கு",
+                marketTrends: "சந்தை போக்குகள்", agriNews: "வேளாண் செய்திகள்", newsItem1Title: "இயற்கை உரங்களுக்கு புதிய மானியம்", newsItem1: "இயற்கை விவசாயத்தை ஊக்குவிக்க புதிய திட்டத்தை அரசு அறிவித்துள்ளது..."
+            }
+        };
+
+        function translatePage(lang) {
+            const langKey = translations[lang] ? lang : 'en';
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (translations[langKey] && translations[langKey][key]) el.innerText = translations[langKey][key];
+            });
+            document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-translate-placeholder');
+                if (translations[langKey] && translations[langKey][key]) el.placeholder = translations[langKey][key];
+            });
+        }
+        
+        // --- History Management Functions (Unmodified) ---
+        function saveHistory() { /* ... */ }
+        function loadHistory() { /* ... */ }
+        function renderHistoryList() { /* ... */ }
+        function switchChat(chatId) { /* ... */ }
+        function startNewChat() { /* ... */ }
+        function promptForDelete(chatId) { /* ... */ }
+        function deleteChat() { /* ... */ }
+        
+        // --- Message Handling (Unmodified) ---
+        function addMessageToDOM(content, sender, isHtml = false) { /* ... */ }
+        function addMessageToState(content, sender, isHtml = false) { /* ... */ }
+        function showLoading(show) { /* ... */ }
+        async function handleSend() { /* ... */ }
+        async function handleImageUpload() { /* ... */ }
+        
+        // --- Weather Functions (Unmodified) ---
+        function getWeatherDetails(code) { /* ... */ }
+        async function fetchWeather(lat, lon) { /* ... */ }
+        function initWeather() { /* ... */ }
+
+        // --- Event Listeners ---
+        sendBtn.addEventListener('click', handleSend);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } });
+        imageBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleImageUpload);
+        settingsBtn.addEventListener('click', () => settingsModalOverlay.classList.remove('hidden'));
+        closeSettingsBtn.addEventListener('click', () => settingsModalOverlay.classList.add('hidden'));
+        languageSelect.addEventListener('change', (e) => translatePage(e.target.value));
+        newChatBtn.addEventListener('click', startNewChat);
+        cancelDeleteBtn.addEventListener('click', () => deleteModalOverlay.classList.add('hidden'));
+        confirmDeleteBtn.addEventListener('click', deleteChat);
+
+        mainTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                mainTabs.forEach(t => t.classList.remove('active'));
+                mainTabs.forEach(t => t.classList.add('text-gray-500'));
+                
+                tab.classList.add('active');
+                tab.classList.remove('text-gray-500');
+                
+                const target = tab.dataset.tab;
+                mainContents.forEach(content => {
+                    if (content.id === `${target}-panel`) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // --- Initializations ---
+        function initializeApp() {
+            loadHistory();
+            if(!activeChatId || chatHistory.length === 0) {
+                startNewChat();
+            } else {
+                switchChat(activeChatId);
+            }
+            initWeather();
+            translatePage(languageSelect.value);
+        }
+
+        initializeApp();
+    });
+    </script>
+</body>
+</html>
+
